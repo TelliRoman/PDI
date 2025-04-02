@@ -2,12 +2,12 @@ import numpy as np
 import cv2 as cv
 from matplotlib import pyplot as plt
 
-botellas = cv.imread("Guia1/botellas.tif", cv.IMREAD_GRAYSCALE)
+botellas = cv.imread(r"C:\Users\pablo\Desktop\PDI\Imagenes\botellas.tif ", cv.IMREAD_GRAYSCALE)
 plt.figure()
 plt.imshow(botellas,cmap='gray')
-'''plt.plot([0,botellas.shape[1]],[(botellas.shape[0] / 2),(botellas.shape[0] / 2)])
+plt.plot([0,botellas.shape[1]],[(botellas.shape[0] / 2),(botellas.shape[0] / 2)])
 plt.figure()
-plt.plot(botellas[int((botellas.shape[0] / 2)),:])'''
+plt.plot(botellas[int((botellas.shape[0] / 2)),:])
 
 ##Idenfiticar posiciones de botellas
 lineahorizontal = botellas[int((botellas.shape[0] / 2)) , :]
