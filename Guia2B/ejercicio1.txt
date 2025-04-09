@@ -1,0 +1,11 @@
+# El histograma de la imagen hist1 muestra altos niveles de intensidad en tonos blancos, con varios picos entre los valores 0 y 50. 
+# También hay presencia de tonos grises y negros, aunque en menor proporción. - Imagen C
+
+# El histograma de la imagen hist2 indica una predominancia de tonos grises, sin presencia significativa de negros y apenas algo de blanco. - Imagen A
+
+# El histograma de la imagen hist3 representa una imagen compuesta principalmente por un tono claro, cercano al blanco con una leve tendencia al gris, 
+# sin presencia de negros ni grises marcados. - Imagen B
+
+# El histograma de la imagen hist4 muestra una gran cantidad de píxeles con un mismo tono de gris, acompañados por una presencia considerable de negros y grises oscuros. - Imagen E
+
+# El histograma de la imagen hist5 no presenta blancos. La imagen está compuesta únicamente por una distribución equilibrada de tonos grises y negros. - Imagen 
