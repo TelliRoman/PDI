@@ -37,3 +37,4 @@ mostrar_imagen()
 # Esperar interacción
 cv.waitKey(0)
 cv.destroyAllWindows()
+
