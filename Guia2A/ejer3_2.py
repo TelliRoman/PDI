@@ -8,7 +8,7 @@ def promediado(x, frames):
     promedio = (suma / x).astype(np.uint8)  # Escalamos de vuelta a valores de 8 bits
     cv2.imshow("Cantidad", promedio)
 
-cap=cv2.VideoCapture(r"Imagenes\pedestrians.mp4")
+cap=cv2.VideoCapture(r"C:\Users\pablo\Desktop\PDI\PDI\Imagenes\pedestrians.mp4")
 
 frames=[]
 while(cap.isOpened()):
