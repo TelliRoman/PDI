@@ -2,9 +2,9 @@ import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
 
-mariposa = cv.imread(r'C:\Users\Roman\Documents\GitHub\PDI\Imagenes\mariposa02.png',cv.IMREAD_GRAYSCALE)
-flores = cv.imread(r'C:\Users\Roman\Documents\GitHub\PDI\Imagenes\flores02.jpg',cv.IMREAD_GRAYSCALE)
-lapices = cv.imread(r'C:\Users\Roman\Documents\GitHub\PDI\Imagenes\lapices02.jpg',cv.IMREAD_GRAYSCALE)
+mariposa = cv.imread(r'C:\Users\pablo\Desktop\PDI\PDI\Imagenes\mariposa02.png',cv.IMREAD_GRAYSCALE)
+flores = cv.imread(r'C:\Users\pablo\Desktop\PDI\PDI\Imagenes\flores02.jpg',cv.IMREAD_GRAYSCALE)
+lapices = cv.imread(r'C:\Users\pablo\Desktop\PDI\PDI\Imagenes\lapices02.jpg',cv.IMREAD_GRAYSCALE)
 plt.figure(0)
 plt.subplot(1,2,1)
 mariposa_gaus = cv.GaussianBlur(mariposa, (5, 5), 1)
