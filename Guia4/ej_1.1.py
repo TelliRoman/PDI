@@ -21,6 +21,8 @@ def rgb2hsi(r, g, b):
     h = h / (2 * np.pi)
     return h, s, i
 
+
+
 # Cargamos imagen
 img = cv.imread(r'C:\Users\pablo\Desktop\PDI\PDI\Imagenes\patron.tif')
 img_rgb = cv.cvtColor(img, cv.COLOR_BGR2RGB)
