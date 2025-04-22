@@ -2,7 +2,7 @@ import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
 
-img = cv.imread(r'C:\Users\Roman\Documents\GitHub\PDI\Imagenes\esqueleto.tif',cv.IMREAD_GRAYSCALE)
+img = cv.imread(r'C:\Users\pablo\Desktop\PDI\PDI\Imagenes\esqueleto.tif',cv.IMREAD_GRAYSCALE)
 
 plt.figure(0)
 plt.imshow(img, cmap='gray')
