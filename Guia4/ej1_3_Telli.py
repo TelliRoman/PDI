@@ -39,5 +39,5 @@ def perfil_intensidad(img,filocol,num):
     plt.show()
     return None
 
-img = cv.imread(r'C:\Users\Roman\Documents\GitHub\PDI\Imagenes\patron.tif')
+img = cv.imread(r'C:\Users\pablo\Desktop\PDI\PDI\Imagenes\patron.tif')
 perfil_intensidad(img,'fila',img.shape[0]//2)
