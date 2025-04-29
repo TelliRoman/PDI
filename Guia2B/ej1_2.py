@@ -2,7 +2,7 @@ import numpy as np
 import cv2 as cv
 import matplotlib.pyplot as plt
 
-ruta_base = 'C:\\Users\\Roman\\Documents\\GitHub\\PDI\\Imagenes\\'  
+ruta_base = 'C:\\Users\\pablo\\Desktop\\PDI\\PDI\\Imagenes\\'  
 histo  = []
 for i in range(1, 6):
     nombre_archivo = f'histo{i}.tif'
@@ -17,13 +17,12 @@ for i in range(0,5):
     plt.figure(i)
     plt.imshow(histo[i], cmap='gray')
 
-#Imagen 1 tiene un pico en las intensidades bajas por lo que es mas oscura,
+#Histograma 1 tiene un pico en las intensidades bajas por lo que es mas oscura,
 #y todas las otras intensidades de grises tienen valores equilibrados por lo que tiene buen contraste
-
-#Imagen 2 es oscura y con poco constraste
-#Imagen 3 es muy oscura y con poco contraste
-#Imagen 4 es muy clara y con poco contraste
-#Imagen 5 es clara y con contraste medio
+#Histograma 2 es media oscura (nivel de gris cercano a 100) y con poco constraste
+#Histograma 3 es muy oscura y con poco contraste
+#Histograma 4 es muy clara y con poco contraste
+#Histograma 5 es clara y con contraste medio
 imagenes  = []
 nombres = ['A', 'B', 'C', 'D', 'E']  # Letras que identifican las imágenes
 
@@ -37,16 +36,17 @@ for letra in nombres:
     else:
         print(f'No se pudo cargar {path_completo}')
 
-'''for i in range(len(imagenes)):
+for i in range(len(imagenes)):
     plt.figure(i+5)
     plt.imshow(imagenes[i], cmap='gray')
-    plt.title(f'Imagen {nombres[i]}')'''
+    plt.title(f'Imagen {nombres[i]}')
 
 #A-2
 #B-4
-#C-1
+#C-1       
 #D-5
 #E-3
+
 for i in range(len(imagenes)):
     histo = cv.calcHist([imagenes[i]], [0], None, [256], [0, 256])
     hist_norm = histo / histo.sum()
@@ -69,8 +69,9 @@ for i in range(len(imagenes)):
     plt.figure(i+10)
     plt.plot(histo, color='black')
     plt.title(f'Histograma Imagen {nombres[i]}')
-#plt.show()
-#LE PEGUE A TODOS
+plt.show()
+#LE PEGUE A TODOS 
+
 '''Media: Brillo promedio.
 
 Varianza: Contraste (cuánto se alejan los valores de la media).
