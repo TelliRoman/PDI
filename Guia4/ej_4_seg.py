@@ -28,18 +28,6 @@ def definir_elipsoide(roi, img, a, b, c):
     return mask
 
 def definir_rectangulo(roi, img, a, b):
-    """
-    Segmenta la imagen usando un subespacio rectangular en HSV basado en H y S.
-
-    Parámetros:
-        roi: Región de interés seleccionada (en BGR)
-        img: Imagen original (en BGR)
-        a: Tolerancia para H
-        b: Tolerancia para S
-
-    Retorna:
-        mask: Máscara binaria donde los píxeles dentro del rango H-S son 255
-    """
     # Convertimos ROI e imagen completa a HSV
     hsv_roi = cv.cvtColor(roi, cv.COLOR_BGR2HSV)
     hsv_img = cv.cvtColor(img, cv.COLOR_BGR2HSV)
@@ -108,3 +96,5 @@ while True:
         break
 
 cv.destroyAllWindows()
+
+
