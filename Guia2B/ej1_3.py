@@ -3,14 +3,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Cargar la imagen en escala de grises
-img = cv.imread(r'C:\Users\Roman\Documents\GitHub\PDI\Imagenes\earth.bmp', cv.IMREAD_GRAYSCALE)
+img = cv.imread(r'C:\Users\pablo\Desktop\PDI\PDI\Imagenes\coin.jpg', cv.IMREAD_GRAYSCALE)
 
-# Ecualizar el histograma
-img_eq = cv.equalizeHist(img)
+# Parámetro A (>1 para high-boost)
+A = 1.2# Podés ajustar este valor
+
+# Suavizado con filtro promedio (puede ser también Gaussiano)
+blurred = cv.GaussianBlur(img, (5 ,5), 0)
+
+# Calcular imagen high-boost
+img_highboost = cv.addWeighted(src1=img, alpha=A, src2=blurred, beta=-1, gamma=0)
 
 # Calcular histogramas
 hist_orig = cv.calcHist([img], [0], None, [256], [0,256])
-hist_eq = cv.calcHist([img_eq], [0], None, [256], [0,256])
+hist_highboost = cv.calcHist([img_highboost], [0], None, [256], [0,256])
 
 # Mostrar todo en una figura
 plt.figure()
@@ -26,33 +32,20 @@ plt.subplot(2,2,2)
 plt.plot(hist_orig, color='black')
 plt.title("Histograma original")
 plt.xlim([0,256])
+plt.ylim([0,1200])
 
-# Imagen ecualizada
+# Imagen high-boost
 plt.subplot(2,2,3)
-plt.imshow(img_eq, cmap='gray')
-plt.title("Imagen ecualizada")
+plt.imshow(img_highboost, cmap='gray')
+plt.title(f"Filtro High-Boost (A={A})")
 plt.axis('off')
 
-# Histograma ecualizado
+# Histograma high-boost
 plt.subplot(2,2,4)
-plt.plot(hist_eq, color='black')
-plt.title("Histograma ecualizado")
+plt.plot(hist_highboost, color='black')
+plt.title("Histograma high-boost")
 plt.xlim([0,256])
+plt.ylim([0,1200])
 
 plt.tight_layout()
 plt.show()
-
-''' ¿Qué diferencias se observan?
-Desde la teoría:
-
-La ecualización busca redistribuir los niveles de gris para usar más eficientemente el rango dinámico (0–255).
-
-Idealmente, el histograma ecualizado debería ser uniforme (todos los niveles con frecuencia similar).
-
-En la práctica:
-
-El histograma no siempre es plano. La ecualización depende del contenido de la imagen.
-
-Se nota una mejor distribución de intensidad, especialmente en imágenes oscuras o con poco contraste.
-
-El contraste mejora visiblemente, resaltando detalles que antes estaban apagados.'''

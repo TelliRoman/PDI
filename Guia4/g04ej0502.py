@@ -4,7 +4,7 @@ import sys
 from matplotlib import pyplot as plt
 
 # Lectura de imágenes
-img=cv.imread("imagenes/Deforestacion.png")
+img=cv.imread(r"C:\Users\pablo\OneDrive\Desktop\PDI\Imagenes\Deforestacion.png",cv.IMREAD_COLOR_BGR)
 img_gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
 
@@ -127,7 +127,6 @@ plt.ylabel("Intensidad Promedio")
 plt.tight_layout()
 plt.show()'''
 
-
 ### VER ZONA DEFORESTADA ###
 b,g,r = cv.split(img_roi)
 h,s,v = cv.split(cv.cvtColor(img_roi,cv.COLOR_BGR2HSV))
@@ -171,20 +170,20 @@ print("Área de la zona con monte: ", monte_area/10000, "ha")
 # Imagen original
 cv.imshow("img",img)
 
-'''img_white = cv.cvtColor(img_white.astype(np.uint8), cv.COLOR_GRAY2BGR)
-cv.imshow("img_white",img_white)'''
+img_white = cv.cvtColor(img_white.astype(np.uint8), cv.COLOR_GRAY2BGR)
+cv.imshow("img_white",img_white)
 
-'''img_black = cv.cvtColor(img_black.astype(np.uint8), cv.COLOR_GRAY2BGR)
-cv.imshow("img_black",img_black)'''
+img_black = cv.cvtColor(img_black.astype(np.uint8), cv.COLOR_GRAY2BGR)
+cv.imshow("img_black",img_black)
 
-'''fig, ax = plt.subplots(nrows=2,ncols=3)
+fig, ax = plt.subplots(nrows=2,ncols=3)
 ax[0,0].imshow(b)
 ax[0,1].imshow(g)
 ax[0,2].imshow(r) 
 ax[1,0].imshow(h)
 ax[1,1].imshow(s)
 ax[1,2].imshow(v)
-plt.show()'''
+plt.show()
 
 # Imagen de la zona de interés
 cv.imshow("img_roi",img_roi)
