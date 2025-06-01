@@ -76,7 +76,7 @@ def graficar_histogramas(imagenes, titulos, fig_num):
     plt.tight_layout()
 
 if __name__ == "__main__":
-    img_sangre = cv.imread(r'C:\Users\Roman\Documents\GitHub\PDI\Imagenes\sangre.jpg',cv.IMREAD_GRAYSCALE)
+    img_sangre = cv.imread(r'C:\Users\pablo\Desktop\PDI\PDI\Imagenes\sangre.jpg',cv.IMREAD_GRAYSCALE)
 
     ruido_gauss = cv.randn( np.zeros(img_sangre.shape, dtype=np.uint8) , 0, 20)
     img_sangre_ruido = img_sangre + ruido_gauss
