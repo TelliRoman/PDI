@@ -1,7 +1,51 @@
+import numpy as np
 import cv2
 import mediapipe as mp
-import numpy as np
 
+# Distancia euclídea entre dos puntos
+def distancia(p1, p2):
+    return np.linalg.norm(np.array(p1) - np.array(p2))
+
+# Función para convertir índice a punto en píxeles
+def punto(idx, face_landmarks, w, h):
+    lm = face_landmarks[idx]
+    return int(lm.x * w), int(lm.y * h)
+
+# Cálculo de la intensidad de AUs necesarias
+def calculate_pain_intensity(face_landmarks, w, h):
+    # AU4: Brow Lower (cejas hacia abajo)
+    d_au4 = distancia(punto( brow_l:=66, face_landmarks, w, h), punto(brow_r:=296, face_landmarks, w, h))
+
+    # AU6: Cheek Raiser (mejilla sube)
+    d_au6 = distancia(punto(159, face_landmarks, w, h), punto(205, face_landmarks, w, h))  # ojo-mejilla izq
+
+    # AU7: Lids Tight (párpado contraído)
+    d_au7 = distancia(punto(159, face_landmarks, w, h), punto(145, face_landmarks, w, h))  # párpado superior-inf
+
+    # AU9: Nose Wrinkler (nariz fruncida)
+    d_au9 = distancia(punto(6, face_landmarks, w, h), punto(4, face_landmarks, w, h))
+
+    # AU10: Upper Lip Raiser (labio superior sube)
+    d_au10 = distancia(punto(13, face_landmarks, w, h), punto(14, face_landmarks, w, h))
+
+    # AU43: Eyes Closed (ojos cerrados)
+    d_au43 = (distancia(punto(159, face_landmarks, w, h), punto(145, face_landmarks, w, h)) +
+              distancia(punto(386, face_landmarks, w, h), punto(374, face_landmarks, w, h))) / 2
+
+    # Normalización simple: valores bajos = mayor activación muscular
+    # Para hacerlo proporcional, usamos una constante arbitraria para escalar (puede calibrarse)
+    scale = 50.0  # Cuanto menor sea la distancia, mayor la AU (1.0 - valor normalizado)
+    AU4 = 1.0 - min(d_au4 / scale, 1.0)
+    AU6 = 1.0 - min(d_au6 / scale, 1.0)
+    AU7 = 1.0 - min(d_au7 / scale, 1.0)
+    AU9 = 1.0 - min(d_au9 / scale, 1.0)
+    AU10 = 1.0 - min(d_au10 / scale, 1.0)
+    AU43 = 1.0 - min(d_au43 / scale, 1.0)
+
+    # Fórmula del dolor propuesta
+    pain = AU4 + max(AU6, AU7) + max(AU9, AU10) + AU43
+
+    return round(pain, 2), {"AU4": AU4, "AU6": AU6, "AU7": AU7, "AU9": AU9, "AU10": AU10, "AU43": AU43}
 # Inicialización de los módulos de MediaPipe para dibujo y detección holística
 mp_drawing = mp.solutions.drawing_utils
 mp_holistic = mp.solutions.holistic
@@ -27,6 +71,27 @@ def apply_soft_mask(frame, ksize=(5, 5)):
     # Aplicamos un filtro Gaussiano, útil para estabilizar ruido o movimientos bruscos
     return cv2.GaussianBlur(frame, ksize, 0)
 
+#Filtro de acentuado 
+def sharpen_image(image):
+    kernel = np.array([[0, -1, 0],
+                       [-1, 5,-1],
+                       [0, -1, 0]])
+    return cv2.filter2D(image, -1, kernel)
+
+# Corrección gamma para mejorar brillo u oscurecer
+def adjust_gamma(image, gamma=1.5):
+    invGamma = 1.0 / gamma
+    table = np.array([(i / 255.0) ** invGamma * 255 for i in range(256)]).astype("uint8")
+    return cv2.LUT(image, table)
+
+# Normalización del canal V (cuando el rango dinámico es bajo)
+def normalize_v_channel(frame):
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    v = hsv[:, :, 2].astype(np.float32)
+    v = 255 * (v - v.min()) / (v.max() - v.min() + 1e-6)
+    hsv[:, :, 2] = v.astype(np.uint8)
+    return cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
+
 # Inicializamos la cámara
 cap = cv2.VideoCapture(0)
 
@@ -36,24 +101,25 @@ with mp_holistic.Holistic(
     model_complexity=1,                # 0 = rápido pero menos preciso, 1 = balanceado, 2 = más preciso pero más lento
     smooth_landmarks=True,             # Suaviza las detecciones en video
     enable_segmentation=False,         # No segmentamos el cuerpo
-    refine_face_landmarks=True,        # Detección refinada de rostro (68 puntos)
+    refine_face_landmarks=True,        # Detección refinada de rostro
     min_detection_confidence=0.5,      # Confianza mínima para detectar
     min_tracking_confidence=0.5        # Confianza mínima para seguir puntos
 ) as holistic:
-
+ 
     while True:
         ret, frame = cap.read()
         if not ret:
             break
-
-        # Aplicamos desenfoque suave antes del análisis
-        softened_frame = apply_soft_mask(frame)
-
-        # Evaluamos borrosidad (Laplace)
-        blurry, blur_score = is_blurry(softened_frame)
+        
+        #Evaluamos borrosidad (Laplace)
+        blurry, blur_score = is_blurry(frame)
+        if blurry:
+            # Si es borrosa se puede aplicar filtro de acentuado o continuar
+            #continue
+            frame = sharpen_image(frame)
 
         # Medimos el brillo de la escena
-        brightness = get_brightness(softened_frame)
+        brightness = get_brightness(frame)
 
         # Interpretamos el nivel de iluminación
         illumination_state = (
@@ -62,47 +128,69 @@ with mp_holistic.Holistic(
             "Sobreexpuesta"
         )
 
+        # Mejora de imagen según iluminación
+        if illumination_state == "Oscura":
+            frame = adjust_gamma(frame, gamma=1.5)  # Aclarar
+        elif illumination_state == "Sobreexpuesta":
+            frame = adjust_gamma(frame, gamma=0.7)  # Oscurecer
+        else:
+            # Medimos rango dinámico del canal V
+            hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+            v = hsv[:, :, 2]
+            rango = np.max(v) - np.min(v)
+            if rango < 60:
+                frame = normalize_v_channel(frame)  # Mejorar contraste general
+
         # Convertimos a RGB para MediaPipe
-        rgb_frame = cv2.cvtColor(softened_frame, cv2.COLOR_BGR2RGB)
+        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
         # Procesamos el frame con MediaPipe Holistic
         results = holistic.process(rgb_frame)
 
         # Copiamos el frame para dibujar sobre él
-        annotated = softened_frame.copy()
+        annotated = frame.copy()
 
         # --- DIBUJO DE LOS PUNTOS Y CONEXIONES ---
-
-        # Dibuja los landmarks del rostro (68 puntos)
         if results.face_landmarks:
-            mp_drawing.draw_landmarks(
-                annotated, results.face_landmarks,
-                mp_holistic.FACEMESH_CONTOURS,
-                mp_drawing.DrawingSpec(color=(80, 110, 10), thickness=1, circle_radius=1),
-                mp_drawing.DrawingSpec(color=(80, 256, 121), thickness=1)
-            )
+            h, w, _ = frame.shape
+            face_landmarks = results.face_landmarks.landmark
+            pain_level, aus = calculate_pain_intensity(results.face_landmarks.landmark, w, h)
 
-        # Dibuja los puntos del cuerpo (hombros, brazos, torso, etc.)
-        if results.pose_landmarks:
-            mp_drawing.draw_landmarks(
-                annotated, results.pose_landmarks,
-                mp_holistic.POSE_CONNECTIONS,
-                mp_drawing.DrawingSpec(color=(255, 0, 0), thickness=2, circle_radius=3),
-                mp_drawing.DrawingSpec(color=(0, 255, 0), thickness=2)
-            )
+            # Mostrar en pantalla
+            cv2.putText(annotated, f"Dolor estimado: {pain_level:.2f}", (10, 90),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            # AU mappings según la imagen
+            au_landmarks = {
+                "AU1": [66, 105, 107, 55, 65, 52, 285, 295, 282, 283, 336, 334],
+                "AU6": [50, 101, 205, 111, 120, 121, 280, 346, 425, 345, 352, 351],
+                "AU9": [6, 197, 195, 5, 4, 275, 294],
+                "AU15": [61, 146, 91, 181, 84, 17, 314, 291, 375, 321, 308, 324],
+                "AU17": [17, 84, 14, 87, 178, 88, 95],
+                "AU44": [159, 145, 153, 154, 386, 374, 382, 385]
+            }
 
-        # Dibuja las manos si están visibles
-        #if results.left_hand_landmarks:
-         #   mp_drawing.draw_landmarks(
-          #      annotated, results.left_hand_landmarks,
-           #     mp_holistic.HAND_CONNECTIONS
-            #)
-        #if results.right_hand_landmarks:
-         #   mp_drawing.draw_landmarks(
-          #      annotated, results.right_hand_landmarks,
-           #     mp_holistic.HAND_CONNECTIONS
-            #)
+            au_colors = {
+                "AU1": (255, 0, 0),
+                "AU6": (0, 255, 0),
+                "AU9": (0, 0, 255),
+                "AU15": (255, 255, 0),
+                "AU17": (255, 0, 255),
+                "AU44": (0, 255, 255)
+            }
 
+            # Dibujo de puntos clave por AU
+            for au, indices in au_landmarks.items():
+                color = au_colors[au]
+                for idx in indices:
+                    x = int(face_landmarks[idx].x * w)
+                    y = int(face_landmarks[idx].y * h)
+                    cv2.circle(annotated, (x, y), 2, color, -1)
+
+                # Etiqueta del AU
+                fx = int(face_landmarks[indices[0]].x * w)
+                fy = int(face_landmarks[indices[0]].y * h) - 5
+                cv2.putText(annotated, au, (fx, fy), cv2.FONT_HERSHEY_SIMPLEX, 0.4, color, 1)
+        
         # --- TEXTO INFORMATIVO EN PANTALLA ---
 
         # Texto sobre borrosidad y valor de varianza
