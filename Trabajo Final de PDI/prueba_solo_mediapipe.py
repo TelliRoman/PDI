@@ -32,8 +32,8 @@ cap = cv2.VideoCapture(0)
 
 # Inicializamos MediaPipe Holistic (rostro + cuerpo + manos)
 with mp_holistic.Holistic(
-    static_image_mode=False,            # True si analizamos imágenes estáticas
-    model_complexity=1,                 # 0 = rápido pero menos preciso, 1 = balanceado, 2 = más preciso pero más lento
+    static_image_mode=False,           # True si analizamos imágenes estáticas
+    model_complexity=1,                # 0 = rápido pero menos preciso, 1 = balanceado, 2 = más preciso pero más lento
     smooth_landmarks=True,             # Suaviza las detecciones en video
     enable_segmentation=False,         # No segmentamos el cuerpo
     refine_face_landmarks=True,        # Detección refinada de rostro (68 puntos)
@@ -92,16 +92,16 @@ with mp_holistic.Holistic(
             )
 
         # Dibuja las manos si están visibles
-        if results.left_hand_landmarks:
-            mp_drawing.draw_landmarks(
-                annotated, results.left_hand_landmarks,
-                mp_holistic.HAND_CONNECTIONS
-            )
-        if results.right_hand_landmarks:
-            mp_drawing.draw_landmarks(
-                annotated, results.right_hand_landmarks,
-                mp_holistic.HAND_CONNECTIONS
-            )
+        #if results.left_hand_landmarks:
+         #   mp_drawing.draw_landmarks(
+          #      annotated, results.left_hand_landmarks,
+           #     mp_holistic.HAND_CONNECTIONS
+            #)
+        #if results.right_hand_landmarks:
+         #   mp_drawing.draw_landmarks(
+          #      annotated, results.right_hand_landmarks,
+           #     mp_holistic.HAND_CONNECTIONS
+            #)
 
         # --- TEXTO INFORMATIVO EN PANTALLA ---
 

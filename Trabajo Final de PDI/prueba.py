@@ -9,8 +9,8 @@ detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor(r'C:\Users\pablo\Desktop\PDI\PDI\Trabajo Final de PDI\shape_predictor_68_face_landmarks.dat')
 
 # MediaPipe
-mp_face_mesh = mp.solutions.face_mesh
-face_mesh = mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=1)
+#mp_face_mesh = mp.solutions.face_mesh
+#face_mesh = mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=1)
 
 def is_blurry(frame, threshold=100.0):
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -54,17 +54,6 @@ while True:
             x = landmarks.part(n).x
             y = landmarks.part(n).y
             cv2.circle(enhanced_frame, (x, y), 1, (255, 0, 0), -1)  # Azul para dlib
-
-    # -------- Detección con MediaPipe --------
-    rgb_frame = cv2.cvtColor(enhanced_frame, cv2.COLOR_BGR2RGB)
-    result = face_mesh.process(rgb_frame)
-
-    if result.multi_face_landmarks:
-        for face_landmarks in result.multi_face_landmarks:
-            for lm in face_landmarks.landmark:
-                ih, iw, _ = enhanced_frame.shape
-                x, y = int(lm.x * iw), int(lm.y * ih)
-                cv2.circle(enhanced_frame, (x, y), 1, (0, 255, 255), -1)  # Amarillo para MediaPipe
 
     # -------- Overlay de texto --------
     text_blur = "Borroso" if blurry else "Borroso no detectado"
