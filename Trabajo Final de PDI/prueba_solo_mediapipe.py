@@ -180,22 +180,34 @@ with mp_holistic.Holistic(
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
             # AU mappings según la imagen
             au_landmarks = {
-                "AU1": [66, 105, 107, 55, 65, 52, 285, 295, 282, 283, 336, 334],
-                "AU6": [50, 101, 205, 111, 120, 121, 280, 346, 425, 345, 352, 351],
-                "AU9": [6, 197, 195, 5, 4, 275, 294],
-                "AU15": [61, 146, 91, 181, 84, 17, 314, 291, 375, 321, 308, 324],
-                "AU17": [17, 84, 14, 87, 178, 88, 95],
-                "AU44": [159, 145, 153, 154, 386, 374, 382, 385]
-            }
+    # AU4: Ceja fruncida (Brow Lowerer) - Puntos clave en ambas cejas
+    "AU4": [70, 63, 53, 105, 52, 66, 65, 107, 55, 285, 336, 295, 296, 282, 334, 283, 293, 300],  # Ceja derecha (336=inicio, 293=centro)
+
+    # AU6: Mejilla elevada (Cheek Raiser) - Puntos alrededor de los ojos y mejillas
+    "AU6": [352, 346, 347, 280, 266, 330, 425, 118, 101, 142, 36, 50, 117, 123],  # Ojo derecho + mejilla
+
+    # AU7: Párpados tensos (Lid Tightener) - Puntos de párpados superiores e inferiores
+    "AU7": [381, 380, 477, 477, 373, 390, 256, 252, 253, 254, 339, 255, 359, 446, 26, 154, 22, 153, 23, 145, 24, 144, 110, 163, 25, 163, 7, 130, 256, 341, 382],  # Párpado derecho
+
+    # AU9: Nariz arrugada (Nose Wrinkler) - Puntos en la nariz y alrededor
+    "AU9": [64, 235, 235, 98, 327, 294, 455, 278, 360, 363, 281, 5, 51, 134, 131, 64, 102, 331, 131, 131, 134, 79, 239, 44, 274, 459, 457, 309, 289, 59, 131, 134],  # Nariz (4=punta, 6=puente)
+
+    # AU10: Labio superior elevado (Upper Lip Raiser) - Puntos en el labio superior y nariz
+    "AU10": [185, 74, 39, 37, 0, 267, 269, 270, 409, 272, 271, 268, 12, 38, 41, 40],  # 0=base nariz, 13/14=labio
+
+    # AU43: Ojos cerrados (Eyes Closed) - Puntos de párpados (similar a AU7 pero más específico)
+    "AU43": [382, 381, 380, 477, 373, 390, 249, 263, 466, 388, 387, 386, 385, 476, 381, 384, 398, 173, 157, 158, 159, 160, 161, 7, 33, 163, 144, 145, 153, 154] # Ojo derecho
+}
 
             au_colors = {
-                "AU1": (255, 0, 0),
-                "AU6": (0, 255, 0),
-                "AU9": (0, 0, 255),
-                "AU15": (255, 255, 0),
-                "AU17": (255, 0, 255),
-                "AU44": (0, 255, 255)
-            }
+    "AU4": (255, 0, 0),       # Rojo para cejas
+    "AU6": (0, 255, 0),       # Verde para mejillas
+    "AU7": (0, 128, 255),     # Celeste para párpados
+    "AU9": (0, 0, 255),       # Azul para nariz
+    "AU10": (255, 0, 255),    # Fucsia para labio superior
+    "AU43": (255, 255, 0)     # Amarillo para ojos cerrados
+}
+
 
             # Dibujo de puntos clave por AU
             for au, indices in au_landmarks.items():
