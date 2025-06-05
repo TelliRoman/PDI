@@ -11,44 +11,59 @@ def punto(idx, face_landmarks, w, h):
     lm = face_landmarks[idx]
     return int(lm.x * w), int(lm.y * h)
 
-# Cálculo de la intensidad de AUs necesarias
-def calculate_pain_intensity(face_landmarks, w, h):
-    # AU4: Brow Lower (cejas hacia abajo)
-    d_au4 = distancia(punto( brow_l:=66, face_landmarks, w, h), punto(brow_r:=296, face_landmarks, w, h))
+# Alinear rostro con transformación afín
+def alinear_rostro(frame, face_landmarks, w, h):
+    ojo_izq = punto(33, face_landmarks, w, h)
+    ojo_der = punto(263, face_landmarks, w, h)
+    centro = punto(1, face_landmarks, w, h)  # entrecejo
+    #Tamaño deseado del rostro alineado.
+    ancho = 200
+    alto = 200
+    #Define las posiciones objetivo (en la imagen alineada) para los 3 puntos clave:
+    destino = np.float32([[60, 100], [140, 100], [100, 140]])
+    origen = np.float32([ojo_izq, ojo_der, centro])
+    #Calcula la matriz de transformación afín M para llevar los puntos origen a las posiciones destino.
+    M = cv2.getAffineTransform(origen, destino)
+    #Aplica la transformación M a toda la imagen, alineando el rostro.
+    frame_alineado = cv2.warpAffine(frame, M, (w, h))
+    #Devuelve la imagen alineada y la matriz de transformación M.
+    return frame_alineado, M
 
-    # AU6: Cheek Raiser (mejilla sube)
-    d_au6 = distancia(punto(159, face_landmarks, w, h), punto(205, face_landmarks, w, h))  # ojo-mejilla izq
+# Aplicar transformación afín a un punto
+def transformar_punto(pt, M):
+    p = np.array([pt[0], pt[1], 1])
+    #Multiplica la matriz M por el vector p para obtener el punto transformado.
+    res = M @ p
+    return (res[0], res[1])
 
-    # AU7: Lids Tight (párpado contraído)
-    d_au7 = distancia(punto(159, face_landmarks, w, h), punto(145, face_landmarks, w, h))  # párpado superior-inf
+# Cálculo del dolor con normalización
+def calculate_pain_intensity_normalized(face_landmarks, w, h, M):
+    #transforma el punto idx usando la matriz M.
+    def t(idx): return transformar_punto(punto(idx, face_landmarks, w, h), M)
 
-    # AU9: Nose Wrinkler (nariz fruncida)
-    d_au9 = distancia(punto(6, face_landmarks, w, h), punto(4, face_landmarks, w, h))
+    # Referencia: distancia entre ojos (escalado adaptativo)
+    ref_dist = distancia(t(33), t(263))
+    if ref_dist < 1.0: ref_dist = 1.0  # evitar división por cero
 
-    # AU10: Upper Lip Raiser (labio superior sube)
-    d_au10 = distancia(punto(13, face_landmarks, w, h), punto(14, face_landmarks, w, h))
+    # Medidas
+    d_au4 = distancia(t(66), t(296))       # Cejas
+    d_au6 = distancia(t(159), t(205))      # Mejillas / contracción orbicular
+    d_au7 = distancia(t(159), t(145))      # Elevación párpado inferior
+    d_au9 = distancia(t(6), t(4))          # Nariz
+    d_au10 = distancia(t(13), t(14))       # Boca
+    d_au43 = (distancia(t(159), t(145)) + distancia(t(386), t(374))) / 2  # Cierre ojos
 
-    # AU43: Eyes Closed (ojos cerrados)
-    d_au43 = (distancia(punto(159, face_landmarks, w, h), punto(145, face_landmarks, w, h)) +
-              distancia(punto(386, face_landmarks, w, h), punto(374, face_landmarks, w, h))) / 2
-
-    # Normalización simple: valores bajos = mayor activación muscular
-    # Para hacerlo proporcional, usamos una constante arbitraria para escalar (puede calibrarse)
-    scale = 50.0  # Cuanto menor sea la distancia, mayor la AU (1.0 - valor normalizado)
-    AU4 = 1.0 - min(d_au4 / scale, 1.0)
-    AU6 = 1.0 - min(d_au6 / scale, 1.0)
-    AU7 = 1.0 - min(d_au7 / scale, 1.0)
-    AU9 = 1.0 - min(d_au9 / scale, 1.0)
-    AU10 = 1.0 - min(d_au10 / scale, 1.0)
-    AU43 = 1.0 - min(d_au43 / scale, 1.0)
-
-    # Fórmula del dolor propuesta
+    # Normalización relativa al ancho facial (ref_dist) Cada medida se normaliza dividiendo por una fracción de ref_dist y restando de 1.0. 
+    AU4 = 1.0 - min(d_au4 / (ref_dist * 0.45), 1.0)
+    AU6 = 1.0 - min(d_au6 / (ref_dist * 0.30), 1.0)
+    AU7 = 1.0 - min(d_au7 / (ref_dist * 0.20), 1.0)
+    AU9 = 1.0 - min(d_au9 / (ref_dist * 0.15), 1.0)
+    AU10 = 1.0 - min(d_au10 / (ref_dist * 0.15), 1.0)
+    AU43 = 1.0 - min(d_au43 / (ref_dist * 0.18), 1.0)
+    #Estos valores estiman la activación de unidades de acción (Action Units) de FACS (Facial Action Coding System).
     pain = AU4 + max(AU6, AU7) + max(AU9, AU10) + AU43
 
     return round(pain, 2), {"AU4": AU4, "AU6": AU6, "AU7": AU7, "AU9": AU9, "AU10": AU10, "AU43": AU43}
-# Inicialización de los módulos de MediaPipe para dibujo y detección holística
-mp_drawing = mp.solutions.drawing_utils
-mp_holistic = mp.solutions.holistic
 
 # Función para determinar si una imagen está borrosa usando la varianza del Laplaciano
 def is_blurry(frame, threshold=100.0):
@@ -92,6 +107,9 @@ def normalize_v_channel(frame):
     hsv[:, :, 2] = v.astype(np.uint8)
     return cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
 
+# Inicialización de los módulos de MediaPipe para dibujo y detección holística
+mp_drawing = mp.solutions.drawing_utils
+mp_holistic = mp.solutions.holistic
 # Inicializamos la cámara
 cap = cv2.VideoCapture(0)
 
@@ -154,29 +172,42 @@ with mp_holistic.Holistic(
         if results.face_landmarks:
             h, w, _ = frame.shape
             face_landmarks = results.face_landmarks.landmark
-            pain_level, aus = calculate_pain_intensity(results.face_landmarks.landmark, w, h)
+            frame_alineado, M = alinear_rostro(frame,face_landmarks , w, h)
+            pain_level, aus = calculate_pain_intensity_normalized(face_landmarks, w, h, M)
 
             # Mostrar en pantalla
             cv2.putText(annotated, f"Dolor estimado: {pain_level:.2f}", (10, 90),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
             # AU mappings según la imagen
             au_landmarks = {
-                "AU1": [66, 105, 107, 55, 65, 52, 285, 295, 282, 283, 336, 334],
-                "AU6": [50, 101, 205, 111, 120, 121, 280, 346, 425, 345, 352, 351],
-                "AU9": [6, 197, 195, 5, 4, 275, 294],
-                "AU15": [61, 146, 91, 181, 84, 17, 314, 291, 375, 321, 308, 324],
-                "AU17": [17, 84, 14, 87, 178, 88, 95],
-                "AU44": [159, 145, 153, 154, 386, 374, 382, 385]
-            }
+    # AU4: Ceja fruncida (Brow Lowerer) - Puntos clave en ambas cejas
+    "AU4": [70, 63, 53, 105, 52, 66, 65, 107, 55, 285, 336, 295, 296, 282, 334, 283, 293, 300],  # Ceja derecha (336=inicio, 293=centro)
+
+    # AU6: Mejilla elevada (Cheek Raiser) - Puntos alrededor de los ojos y mejillas
+    "AU6": [352, 346, 347, 280, 266, 330, 425, 118, 101, 142, 36, 50, 117, 123],  # Ojo derecho + mejilla
+
+    # AU7: Párpados tensos (Lid Tightener) - Puntos de párpados superiores e inferiores
+    "AU7": [381, 380, 477, 477, 373, 390, 256, 252, 253, 254, 339, 255, 359, 446, 26, 154, 22, 153, 23, 145, 24, 144, 110, 163, 25, 163, 7, 130, 256, 341, 382],  # Párpado derecho
+
+    # AU9: Nariz arrugada (Nose Wrinkler) - Puntos en la nariz y alrededor
+    "AU9": [64, 235, 235, 98, 327, 294, 455, 278, 360, 363, 281, 5, 51, 134, 131, 64, 102, 331, 131, 131, 134, 79, 239, 44, 274, 459, 457, 309, 289, 59, 131, 134],  # Nariz (4=punta, 6=puente)
+
+    # AU10: Labio superior elevado (Upper Lip Raiser) - Puntos en el labio superior y nariz
+    "AU10": [185, 74, 39, 37, 0, 267, 269, 270, 409, 272, 271, 268, 12, 38, 41, 40],  # 0=base nariz, 13/14=labio
+
+    # AU43: Ojos cerrados (Eyes Closed) - Puntos de párpados (similar a AU7 pero más específico)
+    "AU43": [382, 381, 380, 477, 373, 390, 249, 263, 466, 388, 387, 386, 385, 476, 381, 384, 398, 173, 157, 158, 159, 160, 161, 7, 33, 163, 144, 145, 153, 154] # Ojo derecho
+}
 
             au_colors = {
-                "AU1": (255, 0, 0),
-                "AU6": (0, 255, 0),
-                "AU9": (0, 0, 255),
-                "AU15": (255, 255, 0),
-                "AU17": (255, 0, 255),
-                "AU44": (0, 255, 255)
-            }
+    "AU4": (255, 0, 0),       # Rojo para cejas
+    "AU6": (0, 255, 0),       # Verde para mejillas
+    "AU7": (0, 128, 255),     # Celeste para párpados
+    "AU9": (0, 0, 255),       # Azul para nariz
+    "AU10": (255, 0, 255),    # Fucsia para labio superior
+    "AU43": (255, 255, 0)     # Amarillo para ojos cerrados
+}
+
 
             # Dibujo de puntos clave por AU
             for au, indices in au_landmarks.items():
