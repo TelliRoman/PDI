@@ -74,7 +74,7 @@ while True:
         keypoints = []
         for idx in keypoints_torso:
             lm = landmarks[idx.value]
-            keypoints.extend([lm.x, lm.y])
+            keypoints.extend([lm.x, lm.y, lm.z])
         norm_keypoints = normalizarKeypoints(keypoints)
 
         # Clasificar postura

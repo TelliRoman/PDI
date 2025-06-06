@@ -76,7 +76,7 @@ while True:
             keypoints = []
             for idx in keypoints_torso:
                 lm = results.pose_landmarks.landmark[idx.value]
-                keypoints.extend([lm.x, lm.y])
+                keypoints.extend([lm.x, lm.y, lm.z])
             norm_keypoints = normalizarKeypoints(keypoints)    
             with open(f'deteccion-postura/datos_postura/buena_{datos_buena_postura}.csv', "w") as f:
                 f.write(",".join(map(str, norm_keypoints)))
@@ -90,7 +90,7 @@ while True:
             keypoints = []
             for idx in keypoints_torso:
                 lm = results.pose_landmarks.landmark[idx.value]
-                keypoints.extend([lm.x, lm.y])
+                keypoints.extend([lm.x, lm.y, lm.z])
             norm_keypoints = normalizarKeypoints(keypoints)
             with open(f"deteccion-postura/datos_postura/mala_{datos_mala_postura}.csv", "w") as f:
                 f.write(",".join(map(str, norm_keypoints)))
