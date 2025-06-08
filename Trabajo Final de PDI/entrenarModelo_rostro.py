@@ -12,7 +12,7 @@ y = []
 for fname in os.listdir("Trabajo Final de PDI/datos_dolor/"):
     if fname.endswith(".csv"):
         label = "no_dolor" if "no_dolor" in fname.lower() else "dolor"
-        vec = np.loadtxt(os.path.join("deteccion-postura/datos_postura/", fname), delimiter=",")
+        vec = np.loadtxt(os.path.join("Trabajo Final de PDI/datos_dolor/", fname), delimiter=",")
         # Elegí una de las dos líneas siguientes:
         features = vec
         X.append(features)
