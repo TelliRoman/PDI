@@ -48,25 +48,28 @@ def calcular_angulo_rotacion(punto_centroide, punto_izquierdo, punto_derecho, ve
 mp_drawing = mp.solutions.drawing_utils
 mp_holistic = mp.solutions.holistic
 # AU mappings según la imagen
-au_landmarks = { 
+au_landmarks = {
     "AU4": [70, 63, 53, 105, 52, 66, 65, 107, 55, 285, 336, 295, 296, 282, 334, 283, 293, 300],
     "AU6": [352, 346, 347, 280, 266, 330, 425, 118, 101, 142, 36, 50, 117, 123],
     "AU7": [381, 380, 477, 373, 390, 256, 252, 253, 254, 339, 255, 359, 446, 26, 154, 22, 153, 23 ,145, 24, 144, 110, 163, 25, 7, 130, 341, 382],
     "AU9": [64, 235, 98, 327, 294, 455, 278, 360, 363, 281, 5, 51, 134, 131, 102, 331, 79, 239,44, 274, 459, 457, 309, 289, 59],
     "AU10": [185, 74, 39, 37, 0, 267, 269, 270, 409, 272, 271, 268, 12, 38, 41, 40],
     "AU43": [382, 380, 477, 373, 390, 249, 263, 466, 388, 387, 386, 385, 476, 384, 398, 173, 157, 158, 159, 160, 161, 7, 33, 163, 144, 145, 153, 154,314, 405, 321, 17, 84, 181, 91, 146, 320, 403, 316, 15, 86, 179, 90, 180, 85, 315, 16, 404, 320],
+    "AUDEMAS":[291, 61, 57, 186, 165, 92, 167, 167, 167, 164, 393, 391, 322, 410, 8, 9, 168, 6, 197, 195, 5, 281, 363, 360, 51, 134, 131, 49, 5, 3, 236, 248, 456, 419, 196, 351, 122],
     "AUCIEN": [368, 139]
+}
+            
 
-}
 au_colors = {
-"AU4": (255, 0, 0),       # Rojo para cejas
-"AU6": (0, 255, 0),       # Verde para mejillas
-"AU7": (0, 128, 255),     # Celeste para párpados
-"AU9": (0, 0, 255),       # Azul para nariz
-"AU10": (255, 0, 255),    # Fucsia para labio superior
-"AU43": (255, 255, 0),    # Amarillo para ojos cerrados
-"AUCIEN": (128, 0, 128)   # Púrpura para cien derecha e izquierda
-}
+            "AU4": (255, 0, 0),       # Rojo para cejas
+            "AU6": (0, 255, 0),       # Verde para mejillas
+            "AU7": (0, 128, 255),     # Celeste para párpados
+            "AU9": (0, 0, 255),       # Azul para nariz
+            "AU10": (255, 0, 255),    # Fucsia para labio superior
+            "AU43": (255, 255, 0) ,    # Amarillo para ojos cerrados
+            "AUDEMAS": (0, 255, 255),   # Naranja para cejas y ojos
+            "AUCIEN": (255, 255, 255)  # Blanco para AUCIEN
+            }
 
 # Cargar modelo entrenado
 with open("Trabajo Final de PDI/modelo_dolor.pkl", "rb") as f:
