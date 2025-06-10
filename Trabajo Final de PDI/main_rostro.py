@@ -42,7 +42,6 @@ def calcular_angulo_rotacion(punto_centroide, punto_izquierdo, punto_derecho, ve
     # Calcular el ángulo con clip para evitar errores numéricos
     dot = np.clip(np.dot(normal_u, ref_u), -1.0, 1.0)
     angulo =np.degrees(np.arccos(dot))
-
     return angulo
 # Inicialización de los módulos de MediaPipe para dibujo y detección holística
 mp_drawing = mp.solutions.drawing_utils
@@ -58,8 +57,6 @@ au_landmarks = {
     "AUDEMAS":[291, 61, 57, 186, 165, 92, 167, 167, 167, 164, 393, 391, 322, 410, 8, 9, 168, 6, 197, 195, 5, 281, 363, 360, 51, 134, 131, 49, 5, 3, 236, 248, 456, 419, 196, 351, 122],
     "AUCIEN": [368, 139]
 }
-            
-
 au_colors = {
             "AU4": (255, 0, 0),       # Rojo para cejas
             "AU6": (0, 255, 0),       # Verde para mejillas
@@ -92,18 +89,19 @@ with mp_holistic.Holistic(
         ret, frame = cap.read()
         if not ret:
             break
+         # Voltear horizontalmente para espejo
+        frame = cv2.flip(frame, 1)
         # Convertimos a RGB para MediaPipe
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         # Procesamos el frame con MediaPipe Holistic
         results = holistic.process(rgb_frame)
         # Copiamos el frame para dibujar sobre él
         annotated = frame.copy()
-        # Voltear horizontalmente para espejo
-        frame = cv2.flip(frame, 1)
-
+       
+        h, w, _ = frame.shape
         # --- DIBUJO DE LOS PUNTOS Y CONEXIONES ---
         if results.face_landmarks:
-            h, w, _ = frame.shape
+           
             face_landmarks = results.face_landmarks.landmark
             #Puntos para el centroide
             cien_derecha=face_landmarks[368]
@@ -117,7 +115,7 @@ with mp_holistic.Holistic(
 
             angulo=calcular_angulo_rotacion(cien_derecha,cien_izquierda,(centroide_x,centroide_y,centroide_z))
             if angulo > 40:
-                label= "MIRA A LA CAMARA SORETE"
+                label= "Porfavor Mira hacia la camara"
                 (text_width, text_height), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.4, 1)
                 x = (w - text_width) // 2
                 y = h - 20  # 20 píxeles de margen inferior
