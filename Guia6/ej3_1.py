@@ -3,13 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from ej1_1 import ruido_exp
 from ej1_1 import ruido_sp
-from scipy.ndimage import minimum_filter, maximum_filter
-#Version optimizada
-def filtro_puntomedio(img, s, t):
-    min_img = minimum_filter(img, size=(s, t), mode='nearest')
-    max_img = maximum_filter(img, size=(s, t), mode='nearest')
-    img_sauv = 0.5 * (min_img.astype(np.float32) + max_img.astype(np.float32))
-    return np.clip(img_sauv, 0, 255).astype(np.uint8)
 
 def filtro_mediana(img,s,t): #Buena reducción de ruido impulsivo sin el desenfoque de un filtro lineal de la misma talla.
     img_sauv = np.zeros_like(img)
@@ -26,7 +19,7 @@ def filtro_mediana(img,s,t): #Buena reducción de ruido impulsivo sin el desenfo
             img_sauv[i, j] = mediana
     return img_sauv
 
-def filtro_puntomedio_bucles(img,s,t):#Util para ruido tipo gaussiano o uniforme.
+def filtro_puntomedio(img,s,t):#Util para ruido tipo gaussiano o uniforme.
     img_sauv = np.zeros_like(img, dtype=np.float32)
     pad_s = s // 2
     pad_t = t // 2
