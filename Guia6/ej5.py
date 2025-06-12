@@ -15,7 +15,7 @@ def mostrar_posicion(event, x, y, flags, param):
         print(f"Valor de intensidad: {magnitude_spectrum[y, x]}")
         posiciones.append((x, y))
 
-img = cv.imread(r'C:\Users\pablo\Desktop\PDI\PDI\Imagenes\img_degradada.tif',cv.IMREAD_GRAYSCALE)
+img = cv.imread(r'Imagenes\img_degradada.tif',cv.IMREAD_GRAYSCALE)
 # Transformada de Fourier en 2D
 f = np.fft.fft2(img)
 # Desplazar el cero a la parte central
