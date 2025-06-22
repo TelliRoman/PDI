@@ -60,7 +60,7 @@ def func_trackbar(x=None):
     # Aplicar HoughLines
     lines = cv.HoughLines(bordes, 1, np.pi/180, accumulator, min_theta=min_theta, max_theta=max_theta)
     # Dibujar líneas sobre una copia de la imagen original
-    img_color = cv.imread(r'C:\Users\Roman\Documents\GitHub\PDI\Imagenes\snowman.png')
+    img_color = cv.imread(r'C:\Users\pablo\Desktop\PDI\PDI\Imagenes\snowman.png')
     if lines is not None:
         for line in lines:
             rho, theta = line[0]
@@ -79,7 +79,7 @@ def func_trackbar(x=None):
     cv.imshow('TH', img_color)
     
 
-img = cv.imread(r'C:\Users\Roman\Documents\GitHub\PDI\Imagenes\snowman.png',cv.IMREAD_GRAYSCALE)
+img = cv.imread(r'C:\Users\pablo\Desktop\PDI\PDI\Imagenes\snowman.png',cv.IMREAD_GRAYSCALE)
 
 cv.namedWindow('TH')
 cv.createTrackbar('Min Theta', 'TH', 0, 180, func_trackbar)

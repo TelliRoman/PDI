@@ -15,7 +15,7 @@ import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
 
-img = cv.imread(r'C:\Users\Roman\Documents\GitHub\PDI\Imagenes\estanbul.tif',cv.IMREAD_GRAYSCALE)
+img = cv.imread(r'C:\Users\pablo\Desktop\PDI\PDI\Imagenes\estanbul.tif',cv.IMREAD_GRAYSCALE)
 
 ksizes = [1, 3, 5, 7]  # Tamaños de kernel a analizar
 

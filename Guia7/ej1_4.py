@@ -29,7 +29,7 @@ def func_trackbar(x=None):
     bordes = cv.Canny(img,umbralbajo,umbralalto,apertureSize=3,L2gradient=l2gradient)
     cv.imshow('Canny', bordes)
 
-img = cv.imread(r'C:\Users\Roman\Documents\GitHub\PDI\Imagenes\estanbul.tif',cv.IMREAD_GRAYSCALE)
+img = cv.imread(r'C:\Users\pablo\Desktop\PDI\PDI\Imagenes\estanbul.tif',cv.IMREAD_GRAYSCALE)
 
 cv.namedWindow('Canny')
 cv.createTrackbar('Bajo', 'Canny', 0, 500, func_trackbar)

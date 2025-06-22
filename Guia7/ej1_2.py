@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 # ---------- Cargar imagen ----------
 #img = cv.imread(r'C:\Users\Roman\Documents\GitHub\PDI\Imagenes\patron_bordes.jpg', cv.IMREAD_GRAYSCALE)
-img = cv.imread(r'C:\Users\Roman\Documents\GitHub\PDI\Imagenes\estanbul.tif',cv.IMREAD_GRAYSCALE)
+img = cv.imread(r'C:\Users\pablo\Desktop\PDI\PDI\Imagenes\estanbul.tif',cv.IMREAD_GRAYSCALE)
 if img is None:
     raise IOError("No se pudo cargar la imagen.")
 

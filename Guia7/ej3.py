@@ -41,7 +41,7 @@ def crecimiento_regiones(img, mask, fila, columna, semilla_val, rangogris=10):
 
 # Cargar imagen y máscara
 #img = cv.imread(r'C:\Users\Roman\Documents\GitHub\PDI\Imagenes\rio.jpg', cv.IMREAD_GRAYSCALE)
-img = cv.imread(r'C:\Users\Roman\Documents\GitHub\PDI\Imagenes\rmn.jpg', cv.IMREAD_GRAYSCALE)
+img = cv.imread(r'C:\Users\pablo\Desktop\PDI\PDI\Imagenes\rmn.jpg', cv.IMREAD_GRAYSCALE)
 
 #DOS OPCIONES PARA MOSTRAR LA IMAGEN Y OBTENER LA SEMILLA CON CLICK
 '''# Mostrar imagen y asignar el callback

@@ -44,7 +44,7 @@ def prewitt(img, tipoborde):
     _, img_bin = cv.threshold(imgfilt, 0, 255, 195)#cv.THRESH_BINARY + cv.THRESH_OTSU)
     return img_bin
 
-img = cv.imread(r'C:\Users\Roman\Documents\GitHub\PDI\Imagenes\estanbul.tif',cv.IMREAD_GRAYSCALE)
+img = cv.imread(r'C:\Users\pablo\Desktop\PDI\PDI\Imagenes\estanbul.tif',cv.IMREAD_GRAYSCALE)
 bordes = prewitt(img,'Todos')
 plt.figure(0)
 plt.imshow(bordes, cmap='gray', vmin=0, vmax=255)

@@ -12,7 +12,7 @@ def ruido_sp(img, probs, probp, valors, valorp):
                 img[i, j] = valors
     return img
 
-img = cv.imread(r'C:\Users\Roman\Documents\GitHub\PDI\Imagenes\mosquito.jpg',cv.IMREAD_GRAYSCALE)
+img = cv.imread(r'C:\Users\pablo\Desktop\PDI\PDI\Imagenes\mosquito.jpg',cv.IMREAD_GRAYSCALE)
 
 gauss_20 = cv.randn(img.copy(), 0, 20)
 gauss_20 = img + gauss_20
