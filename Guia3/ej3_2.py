@@ -2,8 +2,8 @@ import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
 
-img = cv.imread(r'C:\Users\pablo\Desktop\PDI\PDI\Imagenes\camaleon.tif',cv.IMREAD_GRAYSCALE)
-A = 1.5  # Factor de amplificación
+img = cv.imread(r'C:\Users\Roman\Documents\GitHub\PDI\Imagenes\camaleon.tif',cv.IMREAD_GRAYSCALE)
+A = 2
 
 img_PB = cv.boxFilter(img , -1, (3,3),normalize=True)
 img_AltaPotencia = cv.addWeighted(img, A, img_PB, -1, 0)

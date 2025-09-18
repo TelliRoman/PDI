@@ -2,23 +2,28 @@ import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
 
-img=cv.imread(r"C:\Users\pablo\Desktop\PDI\PDI\Imagenes\cameraman.tif", cv.IMREAD_GRAYSCALE)
-media=cv.medianBlur(img, 3)
-media5=cv.medianBlur(img, 5)
-media7=cv.medianBlur(img, 7)
-media9=cv.medianBlur(img, 9)
-fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(12,12))
+img = cv.imread(r'C:\Users\Roman\Documents\GitHub\PDI\Imagenes\camaleon.tif',cv.IMREAD_GRAYSCALE)
 
-ax[0,0].imshow(media, cmap='gray')
-ax[0,0].set_title("Media 3")
-ax[0,1].imshow(media5, cmap='gray')
-ax[0,1].set_title("Media 5")
-ax[1,0].imshow(media7, cmap='gray')
-ax[1,0].set_title("Media 7")
-ax[1,1].imshow(media9, cmap='gray')
-ax[1,1].set_title("Media 9")
+'''
+Un filtro de mediana es un tipo de filtro no lineal muy usado en procesamiento de imágenes para:
+Reducir el ruido impulsivo (también llamado “sal y pimienta”).
+Preservar bordes mejor que los filtros lineales como el promedio (blur).
+
+¿Cómo funciona?
+1-Se toma un vecindario alrededor de cada píxel (por ejemplo, una ventana de 3x3).
+2-Se ordenan los valores de esos píxeles.
+3-Se reemplaza el valor central por la mediana de esos valores.'''
+
+mediana = cv.medianBlur(img, 3)  # Tamaño 3x3
+
+# Mostrar
+plt.subplot(1,2,1)
+plt.imshow(img, cmap='gray')
+plt.title('Original')
+
+plt.subplot(1,2,2)
+plt.imshow(mediana, cmap='gray')
+plt.title('Filtrada con Mediana')
+
+plt.tight_layout()
 plt.show()
-
-# Aplica desenfoque gaussiano con kernel 5x5 y sigmaX = 1
-# sigmaX controla la "anchura" de la campana gaussiana en el eje X (horizontal)
-# A mayor sigmaX, mayor desenfoque (más se mezclan los píxeles vecinos)
